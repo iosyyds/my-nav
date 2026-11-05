@@ -85,6 +85,23 @@ img{display:block;max-width:100%}
 .modal p{font-size:14px;color:#666;line-height:1.8}
 .modal button{margin-top:20px;padding:10px 36px;border:none;border-radius:20px;background:var(--theme);color:#fff;font-size:14px;cursor:pointer;transition:background .2s}
 .modal button:hover{background:var(--theme-dark)}
+/* 详情弹窗 */
+.dm-modal{max-width:420px;text-align:left;padding:0;overflow:hidden}
+.dm-head{padding:36px 32px 20px;text-align:center;background:linear-gradient(135deg,#f1404b,#e91e63);color:#fff}
+.dm-head .big-fav{width:64px;height:64px;border-radius:16px;margin:0 auto 14px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.dm-head .big-fav img{width:40px;height:40px;object-fit:contain}
+.dm-head .big-fav .fb{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff}
+.dm-head h2{color:#fff;font-size:20px;margin-bottom:4px}
+.dm-head .dm-domain{font-size:13px;opacity:.85}
+.dm-body{padding:24px 32px 28px}
+.dm-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f5f6f8;font-size:13px}
+.dm-row:last-child{border-bottom:none}
+.dm-row .lbl{color:#999}
+.dm-row .val{color:#333;font-weight:500;text-align:right;max-width:250px;word-break:break-all}
+.dm-actions{display:flex;gap:12px;margin-top:24px}
+.dm-actions button{flex:1;margin-top:0}
+.dm-actions .btn-ghost{background:#f5f6f8;color:#555}
+.dm-actions .btn-ghost:hover{background:#e8e9eb}
 @media(max-width:768px){.menu{display:none}.hero{min-height:340px}.hero-title{font-size:24px;letter-spacing:5px}.hero-logo{width:80px;height:80px}.hero-logo span{font-size:32px}.grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.searchbox input{height:52px;font-size:16px}.totop{right:16px;bottom:20px}}
 @media(max-width:480px){.grid{grid-template-columns:1fr 1fr}.blob-tr,.blob-bl{display:none}}
 </style>
@@ -142,6 +159,8 @@ img{display:block;max-width:100%}
 <button class="totop" id="totop" onclick="goTop()" aria-label="返回顶部">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m18 15-6-6-6 6"/></svg>
 </button>
+
+<!-- 关于弹窗 -->
 <div class="mask" id="aboutMask" onclick="if(event.target===this)hideAbout()">
   <div class="modal">
     <div class="m-logo">io</div>
@@ -152,11 +171,32 @@ img{display:block;max-width:100%}
     <button onclick="hideAbout()">关闭</button>
   </div>
 </div>
+
+<!-- 详情弹窗 -->
+<div class="mask" id="detailMask" onclick="if(event.target===this)hideDetail()">
+  <div class="modal dm-modal">
+    <div class="dm-head">
+      <div class="big-fav" id="dmFav"></div>
+      <h2 id="dmName"></h2>
+      <div class="dm-domain" id="dmDomain"></div>
+    </div>
+    <div class="dm-body">
+      <div class="dm-row"><span class="lbl">网址</span><span class="val" id="dmUrl"></span></div>
+      <div class="dm-row"><span class="lbl">分类</span><span class="val" id="dmCat"></span></div>
+      <div class="dm-actions">
+        <button class="btn-ghost" onclick="hideDetail()">关闭</button>
+        <button onclick="openSite()">访问网站</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 var CDN=['https://cdn.jsdelivr.net/gh/iosyyds/my-nav@main/src/app/bookmarks.ts','https://fastly.jsdelivr.net/gh/iosyyds/my-nav@main/src/app/bookmarks.ts','https://raw.githubusercontent.com/iosyyds/my-nav/main/src/app/bookmarks.ts'];
 var G=[],cat='all',q='',eng='baidu',ps=36,sa={};
 var E={baidu:'https://www.baidu.com/s?wd=',google:'https://www.google.com/search?q=',bing:'https://www.bing.com/search?q='};
-var searchTimer=null;
+var searchTimer=null,currentItem=null;
+
 async function load(){
   for(var i=0;i<CDN.length;i++){
     try{
@@ -170,10 +210,14 @@ async function load(){
   }
   document.getElementById('content').innerHTML='<div class="state">数据加载失败，请刷新重试</div>';
 }
+
 var C=[['#f1404b','#e91e63'],['#ff9500','#ffb347'],['#e040fb','#c44dff'],['#007aff','#5ac8fa'],['#34c759','#30d158'],['#af52de','#ff2d55'],['#5856d6','#5e5ce6'],['#ff3b30','#ff6b6b']];
 function hs(s){var h=0;for(var i=0;i<s.length;i++)h=s.charCodeAt(i)+((h<<5)-h);return Math.abs(h)}
 function fh(d,n){var c=C[hs(d||n||'x')%C.length],l=(d||'?').charAt(0).toUpperCase();return '<div class="fav"><img src="https://'+d+'/favicon.ico" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="fb" style="display:none;background:linear-gradient(135deg,'+c[0]+','+c[1]+')">'+l+'</div></div>'}
+function bigFav(d,n){var c=C[hs(d||n||'x')%C.length],l=(d||'?').charAt(0).toUpperCase();return '<img src="https://'+d+'/favicon.ico" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="fb" style="display:none;background:linear-gradient(135deg,'+c[0]+','+c[1]+')">'+l+'</div>'}
+
 function gf(){var g=G;if(cat!=='all')g=g.filter(function(x){return x.name===cat});if(q)g=g.map(function(x){return{name:x.name,items:x.items.filter(function(it){return it.name.toLowerCase().indexOf(q)>-1||it.url.toLowerCase().indexOf(q)>-1||it.domain.toLowerCase().indexOf(q)>-1})}}).filter(function(x){return x.items.length>0});return g}
+
 function render(){
   var bar=document.getElementById('catbar');
   var h='<button class="cat'+(cat==='all'?' active':'')+'" data-cat="all">全部</button>';
@@ -188,7 +232,9 @@ function render(){
   g.forEach(function(x){
     var shown=q?x.items.length:(sa[x.name]?x.items.length:Math.min(x.items.length,ps));
     o+='<div class="card"><div class="card-h"><h3>'+x.name+'</h3><span class="n">'+x.items.length+' 个网站</span></div><div class="card-b"><div class="grid">';
-    x.items.slice(0,shown).forEach(function(it){o+='<a class="item" href="'+it.url+'" target="_blank" rel="noopener">'+fh(it.domain,it.name)+'<div class="info"><div class="nm" title="'+it.name+'">'+it.name+'</div><div class="dm">'+it.domain+'</div></div></a>'});
+    x.items.slice(0,shown).forEach(function(it){
+      o+='<div class="item" onclick="showDetail(\''+it.name.replace(/'/g,"\\'")+'\',\''+it.url.replace(/'/g,"\\'")+'\',\''+it.domain.replace(/'/g,"\\'")+'\',\''+x.name.replace(/'/g,"\\'")+'\')">'+fh(it.domain,it.name)+'<div class="info"><div class="nm" title="'+it.name+'">'+it.name+'</div><div class="dm">'+it.domain+'</div></div></div>';
+    });
     o+='</div></div>';
     if(!q&&x.items.length>ps&&!sa[x.name])o+='<div class="more" data-g="'+x.name+'">展开更多 ('+(x.items.length-ps)+')</div>';
     o+='</div>';
@@ -196,6 +242,7 @@ function render(){
   m.innerHTML=o;
   m.querySelectorAll('.more').forEach(function(el){el.onclick=function(){var gname=el.dataset.g;var rect=el.getBoundingClientRect();var targetY=rect.top+window.scrollY-80;sa[gname]=true;render();window.scrollTo(0,targetY)}});
 }
+
 function goTop(){window.scrollTo({top:0,behavior:'smooth'})}
 function goHome(){goTop();setNav('mHome')}
 function goCat(){scrollToContent();setNav('mCat')}
@@ -204,6 +251,19 @@ function focusSearch(){goTop();setTimeout(function(){document.getElementById('si
 function setNav(id){document.querySelectorAll('.menu button').forEach(function(b){b.classList.remove('active')});document.getElementById(id).classList.add('active')}
 function showAbout(){document.getElementById('aboutMask').classList.add('show')}
 function hideAbout(){document.getElementById('aboutMask').classList.remove('show')}
+
+function showDetail(name,url,domain,catName){
+  currentItem={url:url};
+  document.getElementById('dmName').textContent=name;
+  document.getElementById('dmDomain').textContent=domain;
+  document.getElementById('dmUrl').textContent=url;
+  document.getElementById('dmCat').textContent=catName;
+  document.getElementById('dmFav').innerHTML=bigFav(domain,name);
+  document.getElementById('detailMask').classList.add('show');
+}
+function hideDetail(){document.getElementById('detailMask').classList.remove('show')}
+function openSite(){if(currentItem)window.open(currentItem.url,'_blank');hideDetail()}
+
 function doSearch(){var v=document.getElementById('si').value.trim();if(!v){q='';sa={};render();return}q=v.toLowerCase();sa={};render()}
 document.getElementById('si').addEventListener('input',function(e){clearTimeout(searchTimer);searchTimer=setTimeout(function(){q=e.target.value.trim().toLowerCase();if(G.length)render()},250)});
 document.getElementById('si').addEventListener('keydown',function(e){if(e.key!=='Enter')return;var v=e.target.value.trim();if(!v)return;var m=false;G.forEach(function(g){g.items.forEach(function(it){if(it.name.toLowerCase().indexOf(v.toLowerCase())>-1)m=true})});if(!m)window.open(E[eng]+encodeURIComponent(v),'_blank')});
