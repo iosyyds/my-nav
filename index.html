@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的导航</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23007aff'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>N</text></svg>">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,sans-serif;background:#f2f2f7;color:#000;min-height:100vh}
+.header{background:rgba(255,255,255,0.72);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);position:sticky;top:0;z-index:100;padding:16px 20px;border-bottom:0.5px solid rgba(0,0,0,0.1)}
+.header h1{font-size:17px;font-weight:600;text-align:center}
+.search-wrap{max-width:680px;margin:20px auto 0;padding:0 20px}
+.search-bar{display:flex;align-items:center;background:#fff;border-radius:12px;padding:10px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.search-bar svg{width:18px;height:18px;color:#8e8e93;margin-right:10px;flex-shrink:0}
+.search-bar input{border:none;outline:none;flex:1;font-size:16px;background:transparent}
+.engines{display:flex;gap:4px;margin-top:10px;justify-content:center}
+.engine-btn{padding:6px 14px;border-radius:8px;border:none;font-size:13px;cursor:pointer;background:transparent;color:#8e8e93}
+.engine-btn.active{background:#007aff;color:#fff}
+.tabs{display:flex;gap:8px;padding:12px 20px;overflow-x:auto;max-width:1200px;margin:0 auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:8px 16px;border-radius:10px;white-space:nowrap;font-size:14px;font-weight:500;cursor:pointer;background:rgba(255,255,255,0.6);border:none;transition:all .2s}
+.tab.active{background:#007aff;color:#fff}
+.main{max-width:1200px;margin:0 auto;padding:0 20px 40px}
+.group{margin-bottom:28px}
+.group h2{font-size:15px;font-weight:600;margin-bottom:12px;color:#3c3c43}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.card{display:flex;align-items:center;padding:10px 12px;background:rgba(255,255,255,0.8);border-radius:12px;text-decoration:none;color:#000;transition:transform .2s,background .2s}
+.card:hover{transform:scale(1.02);background:#fff}
+.icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0;margin-right:10px}
+.card-name{font-size:13px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.empty{text-align:center;padding:40px;color:#8e8e93}
+</style>
+</head>
+<body>
+<div class="header"><h1>我的导航</h1>
+<div class="search-wrap"><div class="search-bar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input id="searchInput" placeholder="搜索书签或网址..." autofocus></div><div class="engines"><button class="engine-btn active" data-e="baidu">百度</button><button class="engine-btn" data-e="google">Google</button><button class="engine-btn" data-e="bing">必应</button></div></div></div>
+<div class="tabs" id="tabs"></div>
+<div class="main" id="main"></div>
+<script>
+const GROUPS=[
+{name:"开发",items:[]},
+{name:"iOS",items:[]},
+{name:"设计",items:[]},
+{name:"网络",items:[]},
+{name:"网盘",items:[]},
+{name:"AI",items:[]},
+{name:"游戏",items:[]},
+{name:"其他",items:[]}
+];
+const ENGINES={baidu:"https://www.baidu.com/s?wd=",google:"https://www.google.com/search?q=",bing:"https://www.bing.com/search?q="};
+let currentTab="全部",currentEngine="baidu",searchQuery="";
+function hashStr(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h+s.charCodeAt(i))|0}return Math.abs(h)}
+function iconEl(domain){const hue=hashStr(domain)%360;const h=hue;const bg=`linear-gradient(135deg,hsl(${h},70%,55%),hsl(${(h+40)%360},70%,45%))`;const letter=(domain.split(".")[0][0]||"?").toUpperCase();return{bg,letter}}
+function renderTabs(){const el=document.getElementById("tabs");const tabs=["全部",...GROUPS.map(g=>g.name)];el.innerHTML=tabs.map(t=>`<button class="tab ${t===currentTab?'active':''}" onclick="setTab('${t}')">${t}</button>`).join("")}
+function setTab(t){currentTab=t;renderTabs();render()}
+function render(){const main=document.getElementById("main");let groups=GROUPS;if(currentTab!=="全部")groups=groups.filter(g=>g.name===currentTab);if(searchQuery){groups=groups.map(g=>({...g,items:g.items.filter(i=>i.name.toLowerCase().includes(searchQuery)||i.url.toLowerCase().includes(searchQuery)||i.domain.includes(searchQuery))}))}const total=groups.reduce((s,g)=>s+g.items.length,0);if(total===0){main.innerHTML='<div class="empty"><p>没有找到匹配的书签</p></div>';return}main.innerHTML=groups.map(g=>{if(g.items.length===0)return"";return `<div class="group"><h2>${g.name} (${g.items.length})</h2><div class="grid">${g.items.map(i=>{const{bg,letter}=iconEl(i.domain);return `<a class="card" href="${i.url}" target="_blank"><div class="icon" style="background:${bg}">${letter}</div><div class="card-name">${i.name}</div></a>`}).join("")}</div></div>`}).join("")}
+document.getElementById("searchInput").addEventListener("input",e=>{searchQuery=e.target.value.toLowerCase();render()});
+document.querySelectorAll(".engine-btn").forEach(b=>{b.addEventListener("click",()=>{document.querySelectorAll(".engine-btn").forEach(x=>x.classList.remove("active"));b.classList.add("active");currentEngine=b.dataset.e})});
+document.getElementById("searchInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&searchQuery)window.open(ENGINES[currentEngine]+encodeURIComponent(searchQuery),"_blank")});
+renderTabs();render();
+</script>
+</body>
+</html>
