@@ -7,58 +7,86 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23007aff'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>N</text></svg>">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,sans-serif;background:#f2f2f7;color:#000;min-height:100vh}
-.header{background:rgba(255,255,255,0.72);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);position:sticky;top:0;z-index:100;padding:16px 20px;border-bottom:0.5px solid rgba(0,0,0,0.1)}
-.header h1{font-size:17px;font-weight:600;text-align:center}
-.search-wrap{max-width:680px;margin:20px auto 0;padding:0 20px}
-.search-bar{display:flex;align-items:center;background:#fff;border-radius:12px;padding:10px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
-.search-bar svg{width:18px;height:18px;color:#8e8e93;margin-right:10px;flex-shrink:0}
-.search-bar input{border:none;outline:none;flex:1;font-size:16px;background:transparent}
-.engines{display:flex;gap:4px;margin-top:10px;justify-content:center}
-.engine-btn{padding:6px 14px;border-radius:8px;border:none;font-size:13px;cursor:pointer;background:transparent;color:#8e8e93}
-.engine-btn.active{background:#007aff;color:#fff}
+:root{--bg:#f2f2f7;--card:rgba(255,255,255,0.85);--text:#1d1d1f;--ts:#8e8e93;--blue:#007aff;--sep:rgba(60,60,67,0.12)}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+.header{background:rgba(242,242,247,0.72);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);position:sticky;top:0;z-index:100;border-bottom:.5px solid var(--sep)}
+.header-inner{max-width:1200px;margin:0;padding:12px 20px}
+.header h1{font-size:17px;font-weight:700;text-align:center}
+.search-wrap{max-width:680px;margin:16px auto 0;padding:0 20px}
+.search-bar{display:flex;align-items:center;background:#fff;border-radius:14px;padding:10px 16px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.search-bar svg{width:18px;height:18px;color:var(--ts);margin-right:10px;flex-shrink:0}
+.search-bar input{border:none;outline:none;flex:1;font-size:16px;background:transparent;color:var(--text)}
+.engines{display:flex;gap:6px;margin-top:10px;justify-content:center}
+.engine-btn{padding:6px 16px;border-radius:10px;border:none;font-size:13px;font-weight:500;cursor:pointer;background:transparent;color:var(--ts);transition:all .2s}
+.engine-btn.active{background:var(--blue);color:#fff}
 .tabs{display:flex;gap:8px;padding:12px 20px;overflow-x:auto;max-width:1200px;margin:0 auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tab{padding:8px 16px;border-radius:10px;white-space:nowrap;font-size:14px;font-weight:500;cursor:pointer;background:rgba(255,255,255,0.6);border:none;transition:all .2s}
-.tab.active{background:#007aff;color:#fff}
-.main{max-width:1200px;margin:0 auto;padding:0 20px 40px}
-.group{margin-bottom:28px}
-.group h2{font-size:15px;font-weight:600;margin-bottom:12px;color:#3c3c43}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
-.card{display:flex;align-items:center;padding:10px 12px;background:rgba(255,255,255,0.8);border-radius:12px;text-decoration:none;color:#000;transition:transform .2s,background .2s}
-.card:hover{transform:scale(1.02);background:#fff}
-.icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0;margin-right:10px}
-.card-name{font-size:13px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.empty{text-align:center;padding:40px;color:#8e8e93}
+.tab{padding:8px 16px;border-radius:12px;white-space:nowrap;font-size:14px;font-weight:500;cursor:pointer;background:rgba(255,255,255,.7);border:none;transition:all .2s;flex-shrink:0}
+.tab.active{background:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(0,122,255,.3)}
+.main{max-width:1200px;margin:0 auto;padding:8px 20px 60px}
+.group{margin-bottom:32px}
+.group-header{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.group-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.group h2{font-size:17px;font-weight:700}
+.group-count{font-size:13px;color:var(--ts)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.card{display:flex;align-items:center;padding:12px 14px;background:var(--card);border-radius:14px;text-decoration:none;color:var(--text);transition:transform .2s cubic-bezier(.34,1.56,.64,1),background .2s;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.card:hover{transform:scale(1.03);background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.favicon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:12px;overflow:hidden}
+.favicon svg{width:100%;height:100%}
+.card-info{min-width:0;flex:1}
+.card-name{font-size:13px;font-weight:500;line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.card-domain{font-size:11px;color:var(--ts);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-name mark{background:rgba(0,122,255,.15);color:var(--blue);border-radius:3px;padding:0 2px}
+.empty{text-align:center;padding:60px 20px;color:var(--ts);font-size:16px}
+.footer{text-align:center;padding:20px;color:var(--ts);font-size:12px}
+.loading{text-align:center;padding:60px;color:var(--ts)}
+@media(max-width:640px){.grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.card{padding:10px 12px}.favicon{width:32px;height:32px}}
 </style>
 </head>
 <body>
-<div class="header"><h1>我的导航</h1>
-<div class="search-wrap"><div class="search-bar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input id="searchInput" placeholder="搜索书签或网址..." autofocus></div><div class="engines"><button class="engine-btn active" data-e="baidu">百度</button><button class="engine-btn" data-e="google">Google</button><button class="engine-btn" data-e="bing">必应</button></div></div></div>
+<div class="header"><div class="header-inner"><h1>我的导航</h1>
+<div class="search-wrap"><div class="search-bar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input id="searchInput" placeholder="搜索书签或网址…" autofocus></div>
+<div class="engines"><button class="engine-btn active" data-e="baidu">百度</button><button class="engine-btn" data-e="google">Google</button><button class="engine-btn" data-e="bing">必应</button></div></div></div></div>
 <div class="tabs" id="tabs"></div>
-<div class="main" id="main"></div>
+<div class="main" id="main"><div class="loading">加载中…</div></div>
+<div class="footer" id="footer"></div>
 <script>
-const GROUPS=[
-{name:"开发",items:[]},
-{name:"iOS",items:[]},
-{name:"设计",items:[]},
-{name:"网络",items:[]},
-{name:"网盘",items:[]},
-{name:"AI",items:[]},
-{name:"游戏",items:[]},
-{name:"其他",items:[]}
-];
-const ENGINES={baidu:"https://www.baidu.com/s?wd=",google:"https://www.google.com/search?q=",bing:"https://www.bing.com/search?q="};
-let currentTab="全部",currentEngine="baidu",searchQuery="";
-function hashStr(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h+s.charCodeAt(i))|0}return Math.abs(h)}
-function iconEl(domain){const hue=hashStr(domain)%360;const h=hue;const bg=`linear-gradient(135deg,hsl(${h},70%,55%),hsl(${(h+40)%360},70%,45%))`;const letter=(domain.split(".")[0][0]||"?").toUpperCase();return{bg,letter}}
-function renderTabs(){const el=document.getElementById("tabs");const tabs=["全部",...GROUPS.map(g=>g.name)];el.innerHTML=tabs.map(t=>`<button class="tab ${t===currentTab?'active':''}" onclick="setTab('${t}')">${t}</button>`).join("")}
+var PALETTES=[["#007aff","#5ac8fa"],["#af52de","#ff2d55"],["#ff9500","#ffcc00"],["#34c759","#30d158"],["#ff3b30","#ff6b6b"],["#5856d6","#5e5ce6"],["#00c7be","#64d2ff"],["#ff2d55","#ff375f"],["#bfaf9e","#d2c4b5"],["#8e8e93","#aeaeb2"],["#1d1d1f","#3a3a3c"],["#64d2ff","#007aff"]];
+var CAT_COLORS={"AI 工具":"#af52de","iOS / 苹果":"#ff2d55","开发 / 站长":"#007aff","设计 / 素材":"#ff9500","机场 / 网络":"#34c759","网盘 / 资源":"#00c7be","游戏":"#ff3b30","其他":"#8e8e93"};
+var ENGINES={baidu:"https://www.baidu.com/s?wd=",google:"https://www.google.com/search?q=",bing:"https://www.bing.com/search?q="};
+var GROUPS=null,currentTab="全部",currentEngine="baidu",searchQuery="";
+function hashStr(s){var h=0;for(var i=0;i<s.length;i++)h=((h<<5)-h+s.charCodeAt(i))|0;return Math.abs(h)}
+function makeIcon(domain){var h=hashStr(domain);var p=PALETTES[h%PALETTES.length];var l=domain.charAt(0).toUpperCase();var id="g"+(h%100000);return '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="'+id+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="'+p[0]+'"/><stop offset="100%" stop-color="'+p[1]+'"/></linearGradient></defs><rect width="40" height="40" rx="9" fill="url(#'+id+')"/><text x="20" y="27" text-anchor="middle" fill="white" font-size="18" font-weight="700" font-family="-apple-system,sans-serif">'+l+'</text></svg>'}
+function highlight(text,q){if(!q)return text;var idx=text.toLowerCase().indexOf(q.toLowerCase());if(idx===-1)return text;return text.slice(0,idx)+'<mark>'+text.slice(idx,idx+q.length)+'</mark>'+text.slice(idx+q.length)}
+function renderTabs(){var total=GROUPS.reduce(function(s,g){return s+g.items.length},0);var el=document.getElementById("tabs");var h='<button class="tab'+(currentTab==="全部"?' active':'')+'" onclick="setTab(\'全部\')">全部 '+total+'</button>';GROUPS.forEach(function(g){h+='<button class="tab'+(currentTab===g.name?' active':'')+'" onclick="setTab(\''+g.name+'\')">'+g.name+' '+g.items.length+'</button>'});el.innerHTML=h}
 function setTab(t){currentTab=t;renderTabs();render()}
-function render(){const main=document.getElementById("main");let groups=GROUPS;if(currentTab!=="全部")groups=groups.filter(g=>g.name===currentTab);if(searchQuery){groups=groups.map(g=>({...g,items:g.items.filter(i=>i.name.toLowerCase().includes(searchQuery)||i.url.toLowerCase().includes(searchQuery)||i.domain.includes(searchQuery))}))}const total=groups.reduce((s,g)=>s+g.items.length,0);if(total===0){main.innerHTML='<div class="empty"><p>没有找到匹配的书签</p></div>';return}main.innerHTML=groups.map(g=>{if(g.items.length===0)return"";return `<div class="group"><h2>${g.name} (${g.items.length})</h2><div class="grid">${g.items.map(i=>{const{bg,letter}=iconEl(i.domain);return `<a class="card" href="${i.url}" target="_blank"><div class="icon" style="background:${bg}">${letter}</div><div class="card-name">${i.name}</div></a>`}).join("")}</div></div>`}).join("")}
-document.getElementById("searchInput").addEventListener("input",e=>{searchQuery=e.target.value.toLowerCase();render()});
-document.querySelectorAll(".engine-btn").forEach(b=>{b.addEventListener("click",()=>{document.querySelectorAll(".engine-btn").forEach(x=>x.classList.remove("active"));b.classList.add("active");currentEngine=b.dataset.e})});
-document.getElementById("searchInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&searchQuery)window.open(ENGINES[currentEngine]+encodeURIComponent(searchQuery),"_blank")});
-renderTabs();render();
+function render(){var main=document.getElementById("main");var groups=currentTab==="全部"?GROUPS:GROUPS.filter(function(g){return g.name===currentTab});var filtered=groups;if(searchQuery){var q=searchQuery.toLowerCase();filtered=groups.map(function(g){return{name:g.name,items:g.items.filter(function(i){return i.name.toLowerCase().indexOf(q)!==-1||i.domain.indexOf(q)!==-1||i.url.indexOf(q)!==-1})}}).filter(function(g){return g.items.length>0})}var totalShown=filtered.reduce(function(s,g){return s+g.items.length},0);document.getElementById("footer").textContent="共 "+totalShown+" 个书签";if(totalShown===0){main.innerHTML='<div class="empty">没有找到「'+searchQuery+'」</div>';return}main.innerHTML=filtered.map(function(g){var color=CAT_COLORS[g.name]||'#8e8e93';return '<div class="group"><div class="group-header"><span class="group-dot" style="background:'+color+'"></span><h2>'+g.name+'</h2><span class="group-count">'+g.items.length+'</span></div><div class="grid">'+g.items.map(function(i){return '<a class="card" href="'+i.url+'" target="_blank" rel="noopener"><div class="favicon">'+makeIcon(i.domain)+'</div><div class="card-info"><div class="card-name">'+highlight(i.name,searchQuery)+'</div><div class="card-domain">'+i.domain+'</div></div></a>'}).join('')+'</div></div>'}).join('')}
+
+fetch('https://raw.githubusercontent.com/iosyyds/my-nav/main/src/app/bookmarks.ts')
+.then(function(r){return r.text()})
+.then(function(txt){
+  // Parse the TS file to extract the data
+  var start = txt.indexOf('export const BOOKMARK_GROUPS');
+  var bracketStart = txt.indexOf('[', start);
+  // Extract array by finding matching bracket
+  var depth=0,end=-1;
+  for(var i=bracketStart;i<txt.length;i++){if(txt[i]==='[')depth++;if(txt[i]===']'){depth--;if(depth===0){end=i;break}}}
+  var arrStr = txt.slice(bracketStart,end+1);
+  // Convert TS to JS: remove type annotations
+  arrStr = arrStr.replace(/BookmarkItem\[\]/g,'');
+  // Use Function to evaluate
+  GROUPS = new Function('return '+arrStr)();
+  renderTabs();
+  render();
+})
+.catch(function(e){
+  document.getElementById('main').innerHTML='<div class="empty">数据加载失败，请刷新重试</div>';
+});
+
+document.getElementById("searchInput").addEventListener("input",function(e){searchQuery=e.target.value;if(GROUPS)render()});
+document.querySelectorAll(".engine-btn").forEach(function(b){b.addEventListener("click",function(){document.querySelectorAll(".engine-btn").forEach(function(x){x.classList.remove("active")});b.classList.add("active");currentEngine=b.dataset.e})});
+document.getElementById("searchInput").addEventListener("keydown",function(e){if(e.key==="Enter"&&searchQuery){window.open(ENGINES[currentEngine]+encodeURIComponent(searchQuery),"_blank")}});
 </script>
 </body>
 </html>
