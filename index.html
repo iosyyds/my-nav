@@ -66,22 +66,25 @@ function render(){var main=document.getElementById("main");var groups=currentTab
 fetch('https://raw.githubusercontent.com/iosyyds/my-nav/main/src/app/bookmarks.ts')
 .then(function(r){return r.text()})
 .then(function(txt){
-  // Parse the TS file to extract the data
-  var start = txt.indexOf('export const BOOKMARK_GROUPS');
-  var bracketStart = txt.indexOf('[', start);
-  // Extract array by finding matching bracket
-  var depth=0,end=-1;
-  for(var i=bracketStart;i<txt.length;i++){if(txt[i]==='[')depth++;if(txt[i]===']'){depth--;if(depth===0){end=i;break}}}
+  // Find the actual data array, skip type annotations
+  var eqIdx = txt.indexOf('= [');
+  if(eqIdx === -1) throw new Error('cannot find array');
+  var bracketStart = eqIdx + 2; // position of '['
+  var depth=0,end=-1,inStr=false,strCh='';
+  for(var i=bracketStart;i<txt.length;i++){
+    var c=txt[i];
+    if(inStr){if(c===strCh&&txt[i-1]!=='\\')inStr=false;continue}
+    if(c==='"'||c==="'"||c==='`'){inStr=true;strCh=c;continue}
+    if(c==='[')depth++;
+    if(c===']'){depth--;if(depth===0){end=i;break}}
+  }
   var arrStr = txt.slice(bracketStart,end+1);
-  // Convert TS to JS: remove type annotations
-  arrStr = arrStr.replace(/BookmarkItem\[\]/g,'');
-  // Use Function to evaluate
   GROUPS = new Function('return '+arrStr)();
   renderTabs();
   render();
 })
 .catch(function(e){
-  document.getElementById('main').innerHTML='<div class="empty">数据加载失败，请刷新重试</div>';
+  document.getElementById('main').innerHTML='<div class="empty">数据加载失败: '+e.message+'</div>';
 });
 
 document.getElementById("searchInput").addEventListener("input",function(e){searchQuery=e.target.value;if(GROUPS)render()});
